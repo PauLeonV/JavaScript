@@ -82,7 +82,7 @@ if (menu == 's'){
                
                     
             }
-        }while (vidaFinal)
+        }while (vidaFinal>0)
    
                    
 } 
