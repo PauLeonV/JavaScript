@@ -1,13 +1,10 @@
-const porcentaje = (a, b) => a * (b / 100);
-const resta = (a, b) => a - b;
-let vidaU = 500;
-
 class Dios {
-  constructor(nombre, vidaD, ataqueD, poderD) {
+  constructor(nombre, vidaD, ataqueD, poderD, img) {
     this.nombre = nombre;
     this.vidaD = vidaD;
     this.ataqueD = ataqueD;
     this.poderD = poderD;
+    this.img = img;
   }
   toString() {
     return `${this.nombre}-${this.poderD}`;
@@ -17,10 +14,10 @@ class Dios {
   }
 }
 const dioses = [
-  new Dios("Zeus", 200, 50, "Poder del trueno"),
-  new Dios("Poseidón", 175, 40, "Poder de agua"),
-  new Dios("Ares", 150, 30, "Poder del guerrero"),
-  new Dios("Apolo", 125, 20, "Poder de la belleza"),
+  new Dios("Zeus", 200, 50, "Poder del trueno", "./images/zeus.jpg"),
+  new Dios("Poseidón", 175, 40, "Poder de agua", "./images/poseidon.jpg"),
+  new Dios("Ares", 150, 30, "Poder del guerrero", "./images/ares.jpg"),
+  new Dios("Apolo", 125, 20, "Poder de la belleza", "./images/Apolo.jpg"),
 ];
 const ataquesU = [
   { nombre: "Persuación", daño: 10 },
@@ -28,10 +25,97 @@ const ataquesU = [
   { nombre: "Bola de fuego", daño: 25 },
   { nombre: "Bola de nieve", daño: 15 },
 ];
+
+const mailIngreso = document.getElementById("emailAddress"),
+  passIngreso = document.getElementById("password"),
+  checkRecordar = document.getElementById("rememberMe"),
+  btnIngresar = document.getElementById("btnLogin"),
+  contOculto = document.getElementById("logged"),
+  contTarjetasD = document.getElementById("tarjetas"),
+  ataquesContainer = document.getElementById("ataques-container"),
+  btnAtaques = document.getElementById("btn-ataques");
+
+function guardarData(storage) {
+  const data = {
+    mailIngreso: mailIngreso.value,
+    passIngreso: passIngreso.value,
+  };
+  storage.setItem("mailIngreso", JSON.stringify(data));
+}
+btnIngresar.addEventListener("click", (e) => {
+  e.preventDefault();
+  let regexMail = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+
+  if (!regexMail.test(mailIngreso.value) && passIngreso.value < 8) {
+    alert("Rellene todos los campos");
+  } else {
+    mostrarDioses();
+    if (checkRecordar.checked) {
+      guardarData(localStorage);
+    } else {
+      guardarData(sessionStorage);
+    }
+  }
+});
+
+function mostrarDioses() {
+  contenido.style.display = "block";
+
+  crearTarjetas();
+}
+
+function crearTarjetas() {
+  const tarjetas = document.querySelector(".card-group");
+
+  for (let i = 0; i <= 3; i++) {
+    let tarjeta = document.createElement("div");
+    tarjeta.classList.add("tarjeta");
+    tarjetas.appendChild(tarjeta);
+
+    let img = document.createElement("img");
+    img.src = dioses[i].img;
+    tarjeta.appendChild(img);
+
+    let h2 = document.createElement("h2");
+    h2.textContent = dioses[i].nombre;
+    tarjeta.appendChild(h2);
+
+    let p = document.createElement("p");
+    p.textContent = dioses[i].poderD;
+    tarjeta.appendChild(p);
+
+    (p = document.createElement("p")),
+      (p.textContent = "Vida " + dioses[i].vidaD);
+    tarjeta.appendChild(p);
+  }
+}
+
+for (let i = 0; i < ataquesU.length; i++) {
+  const opcion = document.createElement("a");
+  opcion.href = "#";
+  opcion.textContent = ataquesU[i].nombre;
+
+  const itemAtaque = document.createElement("li");
+  itemAtaque.appendChild(opcion);
+
+  ataquesContainer.appendChild(itemAtaque);
+}
+
+btnAtaques.addEventListener("click", function () {
+  if (ataquesContainer.style.display === "none") {
+    ataquesContainer.style.display = "block";
+  } else {
+    ataquesContainer.style.display = "none";
+  }
+});
+
+
+/*const porcentaje = (a, b) => a * (b / 100);
+const resta = (a, b) => a - b;
+let vidaU = 500;
 let diosE;
 let ataque;
-let menu = prompt("¿Preparado para pelear? s/n");
-if (menu == "s") {
+  if (menu == "s") {
   function eleccionDios() {
     let eleccion2 = parseInt(
       prompt(
@@ -135,4 +219,4 @@ if (menu == "s") {
 } else {
   alert("Has ingresado un valor incorrecto");
 }
-
+*/
