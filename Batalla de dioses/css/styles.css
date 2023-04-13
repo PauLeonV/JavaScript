@@ -1,3 +1,8 @@
+.loginBar{
+    background-color: #dafab2;
+    padding: 20px;
+    margin-bottom: 20px;
+}
 body {
 	margin: 0;
 	padding: 0;
@@ -79,36 +84,28 @@ button[type="submit"]:hover {
 	background-color: #444;
 }
 .ataques-container {
-	display: none;
+	
 	position: right;
 	z-index: 1;
   }
 #contenido {
-	display: none;
-	margin: 50px auto;
+	
+    margin: 50px auto;
 	padding: 20px;
 	width: 100%;
 	max-width: 800px;
 	background-color: #f2f2f2db;
 	text-align: center;
 
+	
 }
-.card-group{
-	display: flex;
-	flex-wrap: wrap;
-	width:100px; 
-
+.fakeAncla{
+    text-decoration: underline;
+    color: #0d6efd;
 }
-
-.cardDios {
-   width:100px; 
-   text-align: center;
-
+.cardDios{
+	width: 500px;
 }
-.btn-ataques {
-	position: relative;
-	display: inline-block;
-  }
   
 
   

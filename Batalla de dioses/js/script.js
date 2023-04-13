@@ -1,222 +1,150 @@
-class Dios {
-  constructor(nombre, vidaD, ataqueD, poderD, img) {
-    this.nombre = nombre;
-    this.vidaD = vidaD;
-    this.ataqueD = ataqueD;
-    this.poderD = poderD;
-    this.img = img;
-  }
-  toString() {
-    return `${this.nombre}-${this.poderD}`;
-  }
-  atacarUser() {
-    vidaU = vidaU - this.ataqueD;
-  }
-}
-const dioses = [
-  new Dios("Zeus", 200, 50, "Poder del trueno", "./images/zeus.jpg"),
-  new Dios("Poseidón", 175, 40, "Poder de agua", "./images/poseidon.jpg"),
-  new Dios("Ares", 150, 30, "Poder del guerrero", "./images/ares.jpg"),
-  new Dios("Apolo", 125, 20, "Poder de la belleza", "./images/Apolo.jpg"),
-];
-const ataquesU = [
-  { nombre: "Persuación", daño: 10 },
-  { nombre: "Espadazo", daño: 20 },
-  { nombre: "Bola de fuego", daño: 25 },
-  { nombre: "Bola de nieve", daño: 15 },
-];
-
-const mailIngreso = document.getElementById("emailAddress"),
-  passIngreso = document.getElementById("password"),
-  checkRecordar = document.getElementById("rememberMe"),
-  btnIngresar = document.getElementById("btnLogin"),
+const modalEl = document.getElementById("modalLogin"),
+  modal = new bootstrap.Modal(modalEl),
+  nickIngreso = document.getElementById("nickIngreso"),
+  mailIngreso = document.getElementById("mailIngreso"),
+  passIngreso = document.getElementById("passIngreso"),
+  checkRecordar = document.getElementById("recordarme"),
+  btnLogin = document.getElementById("login"),
+  nickUsuario = document.getElementById("nickUsuario"),
+  btnLogout = document.getElementById("btnLogout"),
   contOculto = document.getElementById("logged"),
   contTarjetasD = document.getElementById("tarjetas"),
   ataquesContainer = document.getElementById("ataques-container"),
-  btnAtaques = document.getElementById("btn-ataques");
+  btnAtacar = document.getElementById("btnAtacar"),
+  toggles = document.querySelectorAll(".toggles");
 
-function guardarData(storage) {
+function guardarUsuario(storage) {
   const data = {
+    nickIngreso: nickIngreso.value.toUpperCase(),
     mailIngreso: mailIngreso.value,
     passIngreso: passIngreso.value,
   };
-  storage.setItem("mailIngreso", JSON.stringify(data));
+  storage.setItem("data", JSON.stringify(data));
 }
-btnIngresar.addEventListener("click", (e) => {
+function recuperarUsuario(storage) {
+  let usuarioData = JSON.parse(storage.getItem("data"));
+  return usuarioData;
+}
+function elegirJugador(data) {
+  nickUsuario.innerHTML = `GUERRERO ${data.nickIngreso}, ¿PREPARADO PARA PELEAR?`;
+}
+
+function borrarDatos() {
+  localStorage.clear();
+  sessionStorage.clear();
+}
+btnLogout.addEventListener("click", () => {
+  borrarDatos();
+  mostrarDioses(toggles, "d-none");
+});
+
+function mostrarDioses(array, clase) {
+  array.forEach((element) => {
+    element.classList.toggle(clase);
+  });
+}
+const usarJson = async function () {
+  let response = await fetch("./js/data.json");
+  let dioses = await response.json();
+  crearTarjetas(dioses);
+};
+
+function crearTarjetas(array) {
+  contTarjetasD.innerHTML = "";
+
+  array.forEach((element) => {
+    let html = `<div class= "card cardDios" id="tarjeta${element.nombre}">
+        <h3 class="card-header" id="nombreDios">${element.nombre}</h3>
+        <img src="${element.img}" alt= "${element.nombre}"class="card-img-bottom" id="imagenDios">
+        <div class="card-body">
+           <p class="card-text" id="vidaDios">Vida: ${element.vida}</p>
+           <p class="card-text" id="poderDios"> ${element.poder} </p>
+           <p class="card-text" id="dañoDios">Daño: ${element.ataque}</p>
+        </div>
+    </div>`;
+    contTarjetasD.innerHTML += html;
+  });
+}
+btnLogin.addEventListener("click", (e) => {
   e.preventDefault();
   let regexMail = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 
   if (!regexMail.test(mailIngreso.value) && passIngreso.value < 8) {
     alert("Rellene todos los campos");
   } else {
-    mostrarDioses();
+    modal.hide();
+    usarJson();
+    
+    mostrarDioses(toggles, "d-none");
+
     if (checkRecordar.checked) {
-      guardarData(localStorage);
+      guardarUsuario(localStorage);
+      elegirJugador(recuperarUsuario(localStorage));
     } else {
-      guardarData(sessionStorage);
+      guardarUsuario(sessionStorage);
+      elegirJugador(recuperarUsuario(sessionStorage));
     }
   }
 });
 
-function mostrarDioses() {
-  contenido.style.display = "block";
 
-  crearTarjetas();
-}
+const obtenerNumeroAleatorio = (min, max) => {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+};
 
-function crearTarjetas() {
-  const tarjetas = document.querySelector(".card-group");
+const seleccionarDios = async (dioses) => {
+  const nombreDioses = dioses.map((nombreD) => nombreD.nombre);
 
-  for (let i = 0; i <= 3; i++) {
-    let tarjeta = document.createElement("div");
-    tarjeta.classList.add("tarjeta");
-    tarjetas.appendChild(tarjeta);
+  const { value: numeroNombre } = await Swal.fire({
+    title: "Escoge tu dios",
+    input: "radio",
+    inputOptions: nombreDioses,
+    inputValidator: (value) => {
+      if (!value) {
+        return "Escoge, por favor!";
+      }
+    },
+  });
 
-    let img = document.createElement("img");
-    img.src = dioses[i].img;
-    tarjeta.appendChild(img);
+  if (numeroNombre !== null && !isNaN(numeroNombre) && numeroNombre >= 0 && numeroNombre < dioses.length) {
+    let vidaJugador = dioses[numeroNombre].vida; 
+    let vidaEnemigo = obtenerNumeroAleatorio(100, 300); 
+    let dañoJugador = dioses[numeroNombre].ataque;
 
-    let h2 = document.createElement("h2");
-    h2.textContent = dioses[i].nombre;
-    tarjeta.appendChild(h2);
+    while (vidaEnemigo > 0 && vidaJugador > 0) {
+      const { value: result } = await Swal.fire({
+        html: `Vida del enemigo: ${vidaEnemigo}<br>Vida del jugador: ${vidaJugador}<br>Escoge una opción:`,
+        showCancelButton: true,
+        confirmButtonText: "Atacar",
+        cancelButtonText: "Rendirse",
+      });
 
-    let p = document.createElement("p");
-    p.textContent = dioses[i].poderD;
-    tarjeta.appendChild(p);
-
-    (p = document.createElement("p")),
-      (p.textContent = "Vida " + dioses[i].vidaD);
-    tarjeta.appendChild(p);
+      if (result) {
+        vidaEnemigo -= dañoJugador;
+        Swal.fire({
+          html: `Has atacado al enemigo con ${dañoJugador} de daño. La vida del enemigo es ahora ${vidaEnemigo}`,
+        });
+      } else {
+        Swal.fire({ html: `Te has rendido. ¡Has perdido!` });
+        break;
+      }
+      
+      if (vidaEnemigo <= 0) {
+        Swal.fire({ html: `¡Has derrotado al enemigo!` });
+      } else {
+        vidaJugador -= obtenerNumeroAleatorio(20, 50); 
+        if (vidaUsuario <= 0) {
+          Swal.fire({ html: `¡El enemigo te ha derrotado!` });
+        }
+      }
+    }
   }
-}
+};
 
-for (let i = 0; i < ataquesU.length; i++) {
-  const opcion = document.createElement("a");
-  opcion.href = "#";
-  opcion.textContent = ataquesU[i].nombre;
-
-  const itemAtaque = document.createElement("li");
-  itemAtaque.appendChild(opcion);
-
-  ataquesContainer.appendChild(itemAtaque);
-}
-
-btnAtaques.addEventListener("click", function () {
-  if (ataquesContainer.style.display === "none") {
-    ataquesContainer.style.display = "block";
-  } else {
-    ataquesContainer.style.display = "none";
-  }
+btnAtacar.addEventListener("click", async (e) => {
+  e.preventDefault();
+  const response = await fetch("./js/data.json");
+  const dioses = await response.json();
+  seleccionarDios(dioses);
 });
 
-
-/*const porcentaje = (a, b) => a * (b / 100);
-const resta = (a, b) => a - b;
-let vidaU = 500;
-let diosE;
-let ataque;
-  if (menu == "s") {
-  function eleccionDios() {
-    let eleccion2 = parseInt(
-      prompt(
-        `Muy bien guerrero, escoge el dios que quieras enfrentar:\n1) ${dioses[0].toString()}\n2) ${dioses[1].toString()}\n3) ${dioses[2].toString()}\n4) ${dioses[3].toString()} `
-      )
-    );
-
-    let opcionCorrecta = true;
-    switch (eleccion2) {
-      case 1:
-        alert(`Has escogido a ${dioses[0].toString()}`);
-        diosE = dioses[0];
-
-        break;
-
-      case 2:
-        alert(`Has escogido a ${dioses[1].toString()}`);
-        diosE = dioses[1];
-
-        break;
-      case 3:
-        alert(`Has escogido a ${dioses[2].toString()}`);
-        diosE = dioses[2];
-
-        break;
-      case 4:
-        alert(`Has escogido a ${dioses[3].toString()}`);
-        diosE = dioses[3];
-
-        break;
-      default:
-        alert("Opción incorrecta");
-        opcionCorrecta = false;
-        break;
-    }
-    return opcionCorrecta;
-  }
-
-  if (eleccionDios()) {
-    for (const ataques of ataquesU) {
-      const index = ataquesU.indexOf(ataques);
-      console.log(
-        `${index + 1}) ${ataques.nombre} - ${ataques.daño} % de vida`
-      );
-    }
-
-    function eleccionAtaque() {
-      opcionCorrecta = true;
-      var eleccion3 = parseInt(
-        prompt(
-          `Escoge un ataque :\n1)${ataquesU[0].nombre}\n2)${ataquesU[1].nombre}\n3)${ataquesU[2].nombre}\n4)${ataquesU[3].nombre} `
-        )
-      );
-
-      switch (eleccion3) {
-        case 1:
-          ataque = porcentaje(diosE.vidaD, ataquesU[0].daño);
-          break;
-
-        case 2:
-          ataque = porcentaje(diosE.vidaD, ataquesU[1].daño);
-          break;
-        case 3:
-          ataque = porcentaje(diosE.vidaD, ataquesU[2].daño);
-          break;
-        case 4:
-          ataque = porcentaje(diosE.vidaD, ataquesU[3].daño);
-          break;
-        default:
-          alert("Opción incorrecta");
-          opcionCorrecta = false;
-          break;
-      }
-
-      return opcionCorrecta;
-    }
-  }
-  if (eleccionAtaque()) {
-    let vidaTotal = resta(diosE.vidaD, ataque);
-
-    let vidaFinal = vidaTotal;
-    let resultado = alert(
-      "Ahora " + diosE.nombre + " tiene " + vidaTotal + " puntos de vida"
-    );
-
-    do {
-      eleccionAtaque();
-      vidaFinal = resta(vidaFinal, ataque);
-      resultado = alert(
-        "Ahora " + diosE.nombre + " tiene " + vidaFinal + " puntos de vida"
-      );
-
-      if (vidaFinal <= 0) {
-        const diosesVivos = dioses.filter (dios => dios.vidaD > 0);
-        alert ("Muy bien guerrero, solo te falta vencer a: \n " + diosesVivos );
-      }
-    } while (vidaFinal > 0);
-  }
-} else if (menu == "n") {
-  alert("Menudo cobarde, largo de aquí");
-} else {
-  alert("Has ingresado un valor incorrecto");
-}
-*/
