@@ -69,7 +69,7 @@ btnLogin.addEventListener("click", (e) => {
   e.preventDefault();
   let regexMail = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 
-  if (!regexMail.test(mailIngreso.value) && passIngreso.value < 8) {
+  if (!regexMail.test(mailIngreso.value) || passIngreso.value.length < 8 || nickIngreso.value.length < 2) {
     alert("Rellene todos los campos");
   } else {
     modal.hide();
