@@ -133,7 +133,7 @@ const seleccionarDios = async (dioses) => {
         Swal.fire({ html: `¡Has derrotado al enemigo!` });
       } else {
         vidaJugador -= obtenerNumeroAleatorio(20, 50); 
-        if (vidaUsuario <= 0) {
+        if (vidaJugador <= 0) {
           Swal.fire({ html: `¡El enemigo te ha derrotado!` });
         }
       }
