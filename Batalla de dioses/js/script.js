@@ -74,7 +74,6 @@ btnLogin.addEventListener("click", (e) => {
   } else {
     modal.hide();
     usarJson();
-    
     mostrarDioses(toggles, "d-none");
 
     if (checkRecordar.checked) {
@@ -125,22 +124,16 @@ const seleccionarDios = async (dioses) => {
           html: `Has atacado al enemigo con ${dañoJugador} de daño. La vida del enemigo es ahora ${vidaEnemigo}`,
         });
       } else {
-        Swal.fire({ html: `Te has rendido. ¡Has perdido!` });
+        Swal.fire({ html: `Te has rendido. ¡Vaya guerrero!` });
         break;
       }
       
-      if (vidaEnemigo <= 0) {
-        Swal.fire({ html: `¡Has derrotado al enemigo!` });
-      } else {
-        vidaJugador -= obtenerNumeroAleatorio(20, 50); 
-        if (vidaJugador <= 0) {
-          Swal.fire({ html: `¡El enemigo te ha derrotado!` });
-        }
+      vidaEnemigo <= 0 ? Swal.fire({ html: `¡Has derrotado al enemigo!, Felicitaciones guerrero` }) : vidaJugador -= obtenerNumeroAleatorio(20, 50); 
+      vidaJugador <= 0 && Swal.fire({ html: `¡Has sido derrotado!` });
+        
       }
     }
   }
-};
-
 btnAtacar.addEventListener("click", async (e) => {
   e.preventDefault();
   const response = await fetch("./js/data.json");
